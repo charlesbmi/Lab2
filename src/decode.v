@@ -1,6 +1,6 @@
 //=============================================================================
 // EE108B Lab 2
-//
+// Authors: Nipun Agarwala, Charles Guan
 // Decode module. Determines what to do with an instruction.
 //=============================================================================
 
@@ -14,7 +14,7 @@ module decode (
     input [31:0] rt_data,
 
     output wire [4:0] reg_write_addr, // destination register number
-    output wire branch_en,            // high when the instruction is a taken branch
+    output reg branch_en,            // high when the instruction is a taken branch
     output wire jump_en,              // high when the instruction is j or jal
     output wire jump_reg_en,          // high when the instruction is jr or jalr
     output reg [3:0] alu_opcode,      // see mips_defines.v, chooses the function of the ALU
@@ -43,23 +43,37 @@ module decode (
 // branch instructions decode
 //******************************************************************************
 
-    // TODO: write logic that decides whether the instruction is a taken branch
-    // This should consist of checking whether the instruction is a branch, and
-    // checking the appropriate condition for the branch.
-    // Remember that the ALU result is an input to the decode module, so you can
-    // use the ALU to evaluate the branch condition.
-
-    assign branch_en = 1'b0;
+    // Decides whether the instruction is a taken branch
+    // TODO: Remember that the ALU result is an input to the decode module, so you can
+    // TODO: use the ALU to evaluate the branch condition.
+    // (Should just pass this to the ALU) and read its result
+    always @ (*) begin
+        case(op)
+            `BEQ:  branch_en = rs_data == rt_data;
+            `BNE:  branch_en = rs_data != rt_data;
+            `BLEZ: branch_en = rs_data <= 32'b0;
+            `BGTZ: branch_en = rs_data >  32'b0;
+            `BLTZ_GEZ:
+                case(rt_addr)
+                    `BLTZ:   branch_en =  rs_data[31];
+                    `BGEZ:   branch_en = ~rs_data[31];
+                    `BLTZAL: branch_en =  rs_data[31];
+                    `BGEZAL: branch_en = ~rs_data[31];
+                    default: branch_en = 1'b0;
+                endcase
+            default: branch_en = 1'b0;
+        endcase
+    end
 
 //******************************************************************************
 // jump instructions decode
 //******************************************************************************
 
-    // TODO: check whether there is a jump or a jump to register and assert
+    // checks whether there is a jump or a jump to register and asserts
     // jump_en or jump_reg_en high if necessary.
 
-    assign jump_en = 1'b0;
-    assign jump_reg_en = 1'b0;
+    assign jump_en = (op == `J) | (op == `JAL);
+    assign jump_reg_en = (op == `JR) | (op == `JALR);
 
 //******************************************************************************
 // shift instruction decode
@@ -79,15 +93,40 @@ module decode (
 // ALU instructions decode / control signal for ALU datapath
 //******************************************************************************
     
-    // TODO: enumerate the remaining {op, funct} pairs and the corresponding
-    // alu operations. Refer to include/mips_defines.v
+    // Matches {op, funct} pairs and the corresponding alu operations
+    // Refer to include/mips_defines.v
+    // ADD, ADDU, ADDI, ADDIU, SUB, SUBU, SLT, SLTU, SLTI, SLTIU, AND, ANDI,
+    // OR, ORI, XOR, XORI, NOR, SRL, SRA, SLL, SRLV, SRAV, SLLV, LUI, SW, LW
 
     always @* begin
         casex({op, funct})
-            {`ORI, `DC6}:       alu_opcode = `ALU_OR;
-            {`SW, `DC6}:        alu_opcode = `ALU_ADD;
-            {`SPECIAL, `SLL}:   alu_opcode = `ALU_SLL;
-            default:            alu_opcode = `ALU_PASSX;
+            {`SPECIAL, `ADD}:  alu_opcode = `ALU_ADD;
+            {`SPECIAL, `ADDU}: alu_opcode = `ALU_ADDU;
+            {`ADDI,    `DC6}:  alu_opcode = `ALU_ADD;
+            {`ADDIU,   `DC6}:  alu_opcode = `ALU_ADDU;
+            {`SPECIAL, `SUB}:  alu_opcode = `ALU_SUB;
+            {`SPECIAL, `SUBU}: alu_opcode = `ALU_SUBU;
+            {`SPECIAL, `SLT}:  alu_opcode = `ALU_SLT;
+            {`SPECIAL, `SLTU}: alu_opcode = `ALU_SLTU;
+            {`SLTI,    `DC6}:  alu_opcode = `ALU_SLT;
+            {`SLTIU,   `DC6}:  alu_opcode = `ALU_SLTU;
+            {`SPECIAL, `AND}:  alu_opcode = `ALU_AND;
+            {`ANDI,    `DC6}:  alu_opcode = `ALU_AND;
+            {`SPECIAL, `OR}:   alu_opcode = `ALU_OR;
+            {`ORI,     `DC6}:  alu_opcode = `ALU_OR;
+            {`SPECIAL, `XOR}:  alu_opcode = `ALU_XOR;
+            {`XORI,    `DC6}:  alu_opcode = `ALU_XOR;
+            {`SPECIAL, `NOR}:  alu_opcode = `ALU_NOR;
+            {`SPECIAL, `SRL}:  alu_opcode = `ALU_SRL;
+            {`SPECIAL, `SRA}:  alu_opcode = `ALU_SRA;
+            {`SPECIAL, `SLL}:  alu_opcode = `ALU_SLL;
+            {`SPECIAL, `SRLV}: alu_opcode = `ALU_SRL;
+            {`SPECIAL, `SRAV}: alu_opcode = `ALU_SRA;
+            {`SPECIAL, `SLLV}: alu_opcode = `ALU_SLL;
+            {`LUI,     `DC6}:  alu_opcode = `ALU_SLL;
+            {`LW,      `DC6}:  alu_opcode = `ALU_ADD;
+            {`SW,      `DC6}:  alu_opcode = `ALU_ADD;
+            default:           alu_opcode = `ALU_PASSX;
     	endcase
     end
 
@@ -95,15 +134,15 @@ module decode (
 // Compute value for 32 bit immediate data
 //******************************************************************************
 
-    // TODO: set imm_ext to the appropriate value based on the type of
-    // instruction. ORI is covered for you.
+    // zero-extend immediate for bitwise operations
+    // for non-bitwise operations, sign-extend or don't care.
 
     wire [31:0] imm_sign_extend = {{16{immediate[15]}}, immediate};  
     wire [31:0] imm_zero_extend = {16'b0, immediate};	
 
     reg [31:0] imm_ext;
     always @* begin
-        if (op == `ORI)
+        if ((op == `ORI) | (op == `ANDI) | (op == `XORI))
             imm_ext = imm_zero_extend;
         else
             imm_ext = imm_sign_extend;
@@ -128,15 +167,13 @@ module decode (
     assign alu_op_y = use_imm_operand ? imm_ext : rt_data;
     assign reg_write_addr = use_imm_operand ? rt_addr : rd_addr;
     
-    // TODO: assert this signal high when the instruction writes to a register
-    // Of the three instructions the starter code supports, only sw doesn't
-    // write to a register.
-    assign reg_write_en = op != `SW;
+    // Asserts high when the instruction writes to a register
+    assign reg_write_en = &{op != `SW, op != `J, op != `JR, ~branch_en};
   
 //******************************************************************************
 // Memory control
 //******************************************************************************
     assign mem_write_en = op == `SW;    // write to memory
-    assign mem_read_en = op == `LW;     // read from memory
+    assign mem_read_en  = op == `LW;    // read from memory
 
 endmodule
