@@ -30,17 +30,33 @@ module alu (
 
     always @* begin
         case (alu_opcode)
-            // PERFORM ALU OPERATIONS DEFINED ABOVE
             `ALU_ADD:   alu_result = alu_op_x + alu_op_y;
+            `ALU_ADDU:  alu_result = alu_op_x + alu_op_y;
+            `ALU_SUB:   alu_result = alu_op_x - alu_op_y;
+            `ALU_SUBU:  alu_result = alu_op_x - alu_op_y;
+            `ALU_SLT:   alu_result = (alu_op_y_signed < alu_op_x_signed)? 1'b1: 1'b0;
+            `ALU_SLTU:  alu_result = (alu_op_x < alu_op_y)? 1'b1: 1'b0;
+            `ALU_AND:   alu_result = alu_op_x & alu_op_y;
+            `ALU_XOR:   alu_result = alu_op_x ^ alu_op_y;
             `ALU_OR:    alu_result = alu_op_x | alu_op_y;
+            `ALU_NOR:   alu_result = ~(alu_op_x | alu_op_y);
+            `ALU_SRL:   alu_result = alu_op_y >> alu_op_x[4:0];
+            `ALU_SRA:   alu_result = alu_op_y_signed >>> alu_op_x[4:0];
             `ALU_SLL:   alu_result = alu_op_y << alu_op_x[4:0]; // shift operations are Y << X[4:0]
             `ALU_PASSX: alu_result = alu_op_x;
+            `ALU_PASSY: alu_result = alu_op_y;
             default:    alu_result = 32'hxxxxxxxx;              // undefined ALU opcode
         endcase
     end
     
-    // TODO: for extra credit, assert this signal high when an add(i) or sub
-    // instruction causes an overflow (or underflow)
-    assign alu_overflow = 1'b0;
+    always @(*)
+        if((alu_op_x + alu_op_y) > 32'hffffffff) begin
+            alu_overflow = 1'b1;
+        end else if((alu_op_x - alu_op_y) < 0) begin
+            alu_overflow = 1'b0;
+        end else begin
+            alu_overflow = 1'b0;
+        end
+    end
 
 endmodule
