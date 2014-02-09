@@ -1,6 +1,6 @@
 //=============================================================================
 // EE108B Lab 2
-//
+// Nipun Agarwala and Charles Guan
 // Instruction fetch module. Maintains PC and updates it. Reads from the
 // instruction ROM.
 //=============================================================================
@@ -22,7 +22,7 @@ module instruction_fetch (
 
     wire [31:0] inc_pc = pc + 3'h4;
 
-    // TODO: set next_pc to the appropriate value based on
+    // sets next_pc to the appropriate value based on
     // whether branch_en or jump_en are set. (Use the appropriate field in
     // the instr wire to calculate the PC-relative and pseudorelative
     // addresses
@@ -34,7 +34,7 @@ module instruction_fetch (
 
     always @*
         casex ({trap_en, branch_en, jump_en, jump_reg_en})
-            4'bx10x: next_pc = ({14{instr[15]},instr[15:0]} << 2) + inc_pc ;
+            4'bx10x: next_pc = ({14{instr[15]},instr[15:0]} << 2) + inc_pc;
             4'bxx1x: next_pc = {inc_pc[31:28], instr[25:0] << 2};
             4'b1xxx: next_pc = trap_pc;
             4'b0001: next_pc = jump_reg_pc;

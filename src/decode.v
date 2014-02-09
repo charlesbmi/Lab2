@@ -160,15 +160,13 @@ module decode (
 // Determine ALU inputs and register writeback address
 //******************************************************************************
 
-
     // sets alu_op_x and alu_op_y based on the kind of operation that
     // must be performed
-
     wire [31:0] shift_amount = {27'b0, isVarShift ? rs_data[4:0] : shamt};
     assign alu_op_x = jump_with_link ? pc : (isShift ? shift_amount : rs_data);
 
     // use immediate operand for I-format instructions
-    // don't use imm_operand for R-format (op == Special)
+    // don't use imm_operand for R-format (op == `SPECIAL)
     wire use_imm_operand = &{op != `SPECIAL, ~is_branch_instr};
 
     assign alu_op_y = jump_with_link ? 32'd4 : (use_imm_operand ? imm_ext : rt_data);
