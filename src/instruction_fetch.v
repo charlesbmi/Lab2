@@ -34,7 +34,7 @@ module instruction_fetch (
 
     always @*
         casex ({trap_en, branch_en, jump_en, jump_reg_en})
-            4'bx10x: next_pc = ({14{instr[15]},instr[15:0], 2'b0) + inc_pc ;
+            4'bx10x: next_pc = {{14{instr[15]}},instr[15:0], 2'b0} + inc_pc ;
             4'bxx1x: next_pc = {inc_pc[31:28], instr[25:0], 2'b0};
             4'b1xxx: next_pc = trap_pc;
             4'b0001: next_pc = jump_reg_pc;

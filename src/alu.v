@@ -12,7 +12,7 @@ module alu (
     input [31:0] alu_op_y,
 
     output reg [31:0] alu_result,
-    output wire alu_overflow
+    output reg alu_overflow
 );
 
 //******************************************************************************
@@ -53,10 +53,9 @@ module alu (
         if((alu_op_x + alu_op_y) > 32'hffffffff) begin
             alu_overflow = 1'b1;
         end else if((alu_op_x - alu_op_y) < 0) begin
-            alu_overflow = 1'b0;
+            alu_overflow = 1'b1;
         end else begin
             alu_overflow = 1'b0;
         end
-    end
 
 endmodule
