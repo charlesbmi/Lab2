@@ -35,10 +35,10 @@ module irom (
     assign memory[ 16] = {`SPECIAL, `T3, `S0, `T1, `SLTU};
     assign memory[ 17] = {`SLTI, `S3, `ZERO, 16'b1};
     assign memory[ 18] = {`SLTIU, `S3, `ZERO, 16'b1};
-    assign memory[ 19] = {`SPECIAL, `S3, S3, S3, `AND};
+    assign memory[ 19] = {`SPECIAL, `S3, `S3, `S3, `AND};
     assign memory[ 20] = {`ANDI, `S3, `ZERO, 16'hffff};
-    assign memory[ 21] = {`NOP};
-    assign memory[ 22] = {`NOP};
+    assign memory[ 21] = {`SPECIAL, `T0, `S3, `T0, `OR};
+    assign memory[ 22] = {`SPECIAL, `T0, `S3, `T0, `XOR};
     assign memory[ 23] = {`NOP};
     assign memory[ 24] = {`NOP};
     assign memory[ 25] = {`NOP};
