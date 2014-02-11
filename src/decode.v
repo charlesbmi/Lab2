@@ -74,10 +74,10 @@ module decode (
     // jump_en or jump_reg_en high if necessary.
 
     assign jump_en = (op == `J) | (op == `JAL);
-    assign jump_reg_en = (op == `JR) | (op == `JALR);
+    assign jump_reg_en = (op == `SPECIAL) & ((funct == `JR) | (funct == `JALR));
 
-    wire jump_no_link = (op == `J) | (op == `JR);
-    wire jump_with_link = (op == `JAL) | (op == `JALR);
+    wire jump_no_link = (op == `J) | ((op == `SPECIAL) & (funct == `JR));
+    wire jump_with_link = (op == `JAL) | ((op == `SPECIAL) & (funct == `JALR));
 
 //******************************************************************************
 // shift instruction decode
@@ -173,7 +173,7 @@ module decode (
     assign reg_write_addr = jump_with_link ? 5'd31 : (use_imm_operand ? rt_addr : rd_addr); 
     
     // Asserts high when the instruction writes to a register
-    assign reg_write_en = &{op != `SW, jump_no_link, ~is_branch_instr};
+    assign reg_write_en = &{op != `SW, ~jump_no_link, ~is_branch_instr};
   
 //******************************************************************************
 // Memory control
