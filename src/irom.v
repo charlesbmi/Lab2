@@ -2,6 +2,10 @@
 
 `include "mips_defines.v"
 
+`define WRITE_BYTE 26'd505
+`define WRITE_SQUARE 26'd488
+`define POLL_FOR_READY 26'd506
+`define EXIT 26'd511
 `define ADDR_WIDTH 9
 `define INSTR_WIDTH 32
 `define NUM_INSTR 512
@@ -492,41 +496,41 @@ module irom (
     assign memory[473] = {`NOP};
     assign memory[474] = {`NOP};
     assign memory[475] = {`NOP};
-    assign memory[476] = {`NOP};
+    assign memory[476] = {`LUI, `NULL, `SP, 16'hffff};
     assign memory[477] = {`NOP};
-    assign memory[478] = {`NOP};
-    assign memory[479] = {`NOP};
-    assign memory[480] = {`NOP};
-    assign memory[481] = {`NOP};
+    assign memory[478] = {`ADDI, `ZERO, `A0, 16'd4};
+    assign memory[479] = {`ADDI, `ZERO, `A1, 16'd4};
+    assign memory[480] = {`ADDI, `ZERO, `A2, 16'h2};
+    assign memory[481] = {`JAL, `WRITE_SQUARE};
     assign memory[482] = {`NOP};
     assign memory[483] = {`NOP};
     assign memory[484] = {`NOP};
     assign memory[485] = {`NOP};
-    assign memory[486] = {`NOP};
+    assign memory[486] = {`J, `EXIT}; // Functions
     assign memory[487] = {`NOP};
-    assign memory[488] = {`NOP};
-    assign memory[489] = {`NOP};
-    assign memory[490] = {`NOP};
-    assign memory[491] = {`NOP};
-    assign memory[492] = {`NOP};
-    assign memory[493] = {`NOP};
-    assign memory[494] = {`NOP};
-    assign memory[495] = {`NOP};
-    assign memory[496] = {`NOP};
-    assign memory[497] = {`NOP};
-    assign memory[498] = {`NOP};
-    assign memory[499] = {`NOP};
-    assign memory[500] = {`NOP};
-    assign memory[501] = {`NOP};
-    assign memory[502] = {`NOP};
-    assign memory[503] = {`NOP};
-    assign memory[504] = {`NOP};
-    assign memory[505] = {`NOP};
-    assign memory[506] = {`NOP};
-    assign memory[507] = {`NOP};
-    assign memory[508] = {`NOP};
-    assign memory[509] = {`NOP};
-    assign memory[510] = {`NOP};
-    assign memory[511] = {`NOP};
+    assign memory[488] = {`ADDIU, `SP, `SP, 16'd0 - 16'd32}; // WRITE_SQUARE
+    assign memory[489] = {`SW, `SP, `RA, 16'd28}; // Exit write lw    $a0, 20($sp)
+    assign memory[490] = {`SW, `SP, `A0, 16'd24}; // Exit write lw    $a0, 20($sp)
+    assign memory[491] = {`SLTI, `A1, `T0, 16'd0};
+    assign memory[492] = {`BNE, `T0, `ZERO, 16'd7};
+    assign memory[493] = {`SLTI, `A1, `T0, 16'd30};
+    assign memory[494] = {`BEQ, `T0, `ZERO, 16'd5}; // Branch to exit write
+    assign memory[495] = {`JAL, `WRITE_BYTE};
+    assign memory[496] = {`SPECIAL, `A1, `ZERO, `A0, `NULL, `ADD};
+    assign memory[497] = {`JAL, `WRITE_BYTE};
+    assign memory[498] = {`SPECIAL, `A2, `ZERO, `A0, `NULL, `ADD};
+    assign memory[499] = {`JAL, `WRITE_BYTE};
+    assign memory[500] = {`LW, `SP, `A0, 16'd24}; // Exit write lw    $a0, 20($sp)
+    assign memory[501] = {`LW, `SP, `RA, 16'd28}; // lw    $ra, 28($sp)
+    assign memory[502] = {`ADDIU, `SP, `SP, 16'd32}; // addiu $sp, $sp, 32
+    assign memory[503] = {`SPECIAL, `RA, `NULL, `NULL, `NULL, `JR}; // jr $ra
+    assign memory[504] = {`NOP}; // 
+    assign memory[505] = {`NOP}; // WRITE_BYTE: la    $t8, 0xffff0008 
+    assign memory[506] = {`LW, `T8, `T9, 16'b0}; // POLL_FOR_READY: lw    $t9, 0($t8)
+    assign memory[507] = {`ANDI, `T9, `T9, 16'd1}; // andi  $t9, $t9, 1
+    assign memory[508] = {`BLEZ, `T9, `NULL, `POLL_FOR_READY}; // blez  $t9, poll_for_ready
+    assign memory[509] = {`SW, `T8, `A0, 16'd4}; // sw $a0, 4($t8)
+    assign memory[510] = {`SPECIAL, `RA, `NULL, `NULL, `NULL, `JR}; // jr $ra
+    assign memory[511] = {`NOP}; // Exit
 
 endmodule
