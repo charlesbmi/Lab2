@@ -29,18 +29,6 @@ module irom (
     assign memory[ 10] = {`ANDI, `ZERO, `S1, 16'h100};
     assign memory[ 11] = {`SPECIAL, `T0, `T1, `T2, 5'd0, `ADDU};
     assign memory[ 12] = {`ADDIU, `ZERO, `S4, 16'h02c3};
-<<<<<<< HEAD
-    assign memory[ 13] = {`SPECIAL, `ZERO, `S0, `T1, `SUB};
-    assign memory[ 14] = {`SPECIAL, `T2, `S0, `T1, `SUBU};
-    assign memory[ 15] = {`SPECIAL, `S0, `ZERO, `T5, `SLT};
-    assign memory[ 16] = {`SPECIAL, `T3, `S0, `T1, `SLTU};
-    assign memory[ 17] = {`SLTI, `S3, `ZERO, 16'b1};
-    assign memory[ 18] = {`SLTIU, `S3, `ZERO, 16'b1};
-    assign memory[ 19] = {`SPECIAL, `S3, `S3, `S3, `AND};
-    assign memory[ 20] = {`ANDI, `S3, `ZERO, 16'hffff};
-    assign memory[ 21] = {`SPECIAL, `T0, `S3, `T0, `OR};
-    assign memory[ 22] = {`SPECIAL, `T0, `S3, `T0, `XOR};
-=======
     assign memory[ 13] = {`SPECIAL, `ZERO, `S0, `T1, 5'd0, `SUB};
     assign memory[ 14] = {`SPECIAL, `T2, `T2, `S0, 5'd0, `SUBU};
     assign memory[ 15] = {`SPECIAL, `S0, `ZERO, `T5, 5'd0, `SLT};
@@ -51,7 +39,6 @@ module irom (
     assign memory[ 20] = {`ANDI, `ZERO, `S3, 16'hffff};
     assign memory[ 21] = {`NOP};
     assign memory[ 22] = {`NOP};
->>>>>>> 5a891a475c49bcc6c8210da9d173097dfef2ef1b
     assign memory[ 23] = {`NOP};
     assign memory[ 24] = {`NOP};
     assign memory[ 25] = {`NOP};
