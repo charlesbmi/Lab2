@@ -24,11 +24,12 @@ module irom (
     assign memory[  5] = {`SW, `T0, `T1, 16'hc};
     assign memory[  6] = {`ORI, `T1, `T1, 8'd2, 8'd0}; 
     assign memory[  7] = {`SW, `T0, `T1, 16'hc};
-    assign memory[  8] = {`SPECIAL, `ZERO, `T1, `S0, `ADD};
+    assign memory[  8] = {`SPECIAL, `ZERO, `T1, `S0, 5'd0, `ADD};
     assign memory[  9] = {`ADDI, `ZERO, `S1, 16'h100};
     assign memory[ 10] = {`ANDI, `ZERO, `S1, 16'h100};
-    assign memory[ 11] = {`SPECIAL, `T0, `T1, `T2, `ADDU};
+    assign memory[ 11] = {`SPECIAL, `T0, `T1, `T2, 5'd0, `ADDU};
     assign memory[ 12] = {`ADDIU, `ZERO, `S4, 16'h02c3};
+<<<<<<< HEAD
     assign memory[ 13] = {`SPECIAL, `ZERO, `S0, `T1, `SUB};
     assign memory[ 14] = {`SPECIAL, `T2, `S0, `T1, `SUBU};
     assign memory[ 15] = {`SPECIAL, `S0, `ZERO, `T5, `SLT};
@@ -39,6 +40,18 @@ module irom (
     assign memory[ 20] = {`ANDI, `S3, `ZERO, 16'hffff};
     assign memory[ 21] = {`SPECIAL, `T0, `S3, `T0, `OR};
     assign memory[ 22] = {`SPECIAL, `T0, `S3, `T0, `XOR};
+=======
+    assign memory[ 13] = {`SPECIAL, `ZERO, `S0, `T1, 5'd0, `SUB};
+    assign memory[ 14] = {`SPECIAL, `T2, `T2, `S0, 5'd0, `SUBU};
+    assign memory[ 15] = {`SPECIAL, `S0, `ZERO, `T5, 5'd0, `SLT};
+    assign memory[ 16] = {`SPECIAL, `T0, `S0, `T1, 5'd0, `SLTU};
+    assign memory[ 17] = {`SLTI, `ZERO, `S3, 16'b1};
+    assign memory[ 18] = {`SLTIU, `ZERO, `S3, 16'b1};
+    assign memory[ 19] = {`SPECIAL, `S0, `S0, `S0, 5'd0, `AND};
+    assign memory[ 20] = {`ANDI, `ZERO, `S3, 16'hffff};
+    assign memory[ 21] = {`NOP};
+    assign memory[ 22] = {`NOP};
+>>>>>>> 5a891a475c49bcc6c8210da9d173097dfef2ef1b
     assign memory[ 23] = {`NOP};
     assign memory[ 24] = {`NOP};
     assign memory[ 25] = {`NOP};
