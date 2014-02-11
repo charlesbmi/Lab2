@@ -129,8 +129,8 @@ module decode (
             {`SPECIAL, `SRAV}: alu_opcode = `ALU_SRA;
             {`SPECIAL, `SLLV}: alu_opcode = `ALU_SLL;
             {`LUI,     `DC6}:  alu_opcode = `ALU_SLL;
-            {`LW,      `DC6}:  alu_opcode = `ALU_ADD;
-            {`SW,      `DC6}:  alu_opcode = `ALU_ADD;
+            {`LW,      `DC6}:  alu_opcode = `ALU_ADDU;
+            {`SW,      `DC6}:  alu_opcode = `ALU_ADDU;
             default:           alu_opcode = `ALU_PASSX;
     	endcase
         if (jump_with_link)
@@ -170,7 +170,7 @@ module decode (
     wire use_imm_operand = &{op != `SPECIAL, ~is_branch_instr};
 
     assign alu_op_y = jump_with_link ? 32'd4 : (use_imm_operand ? imm_ext : rt_data);
-    assign reg_write_addr = jump_with_link ? 5'd31 : (use_imm_operand ? rt_addr : rd_addr); 
+    assign reg_write_addr = jump_with_link ? `RA : (use_imm_operand ? rt_addr : rd_addr); 
     
     // Asserts high when the instruction writes to a register
     assign reg_write_en = &{op != `SW, ~jump_no_link, ~is_branch_instr};
