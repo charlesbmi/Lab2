@@ -52,7 +52,7 @@ module irom (
     assign memory[ 30] = {`BEQ, `S3, `S3, 16'd0};
     assign memory[ 31] = {`SPECIAL, `T0, `T0, `T0, 5'd0, `XOR};
     assign memory[ 32] = {`BLEZ, `ZERO, 5'd0, 16'd0}; // Testing the Branch Instructions
-    assign memory[ 33] = {`BGTZ, `S0, 5'd0, 16'd0};
+    assign memory[ 33] = {`BGTZ, `ZERO, 5'd0, 16'd5};
     assign memory[ 34] = {`BGEZ, `ZERO, 5'h1, 16'd0};
     assign memory[ 35] = {`NOP};
     assign memory[ 36] = {`NOP};
@@ -70,7 +70,7 @@ module irom (
     assign memory[ 48] = {`NOP};
     assign memory[ 49] = {`NOP};
     assign memory[ 50] = {`NOP};
-    assign memory[ 51] = {`NOP};
+    assign memory[ 51] = {`J, 26'd476};
     assign memory[ 52] = {`NOP};
     assign memory[ 53] = {`NOP};
     assign memory[ 54] = {`NOP};
