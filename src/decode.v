@@ -30,7 +30,7 @@ module decode (
 //******************************************************************************
 // instruction fields
 //******************************************************************************
-
+    wire isLUI;
     wire [5:0] op = instr[31:26];
     assign rs_addr = instr[25:21];
     assign rt_addr = instr[20:16];
@@ -77,7 +77,7 @@ module decode (
     assign jump_reg_en = (op == `SPECIAL) & ((funct == `JR) | (funct == `JALR));
 
     wire jump_no_link = (op == `J) | ((op == `SPECIAL) & (funct == `JR));
-    wire jump_with_link = (op == `JAL) | ((op == `SPECIAL) & (funct == `JALR)) | ((branch_en) & (rt_addr == BLTZAL | rt_addr == BGEZAL));
+    wire jump_with_link = (op == `JAL) | ((op == `SPECIAL) & (funct == `JALR)) | ((branch_en) & (rt_addr == `BLTZAL | rt_addr == `BGEZAL));
 
 //******************************************************************************
 // shift instruction decode
@@ -89,7 +89,7 @@ module decode (
     wire isSLLV = (op == `SPECIAL) & (funct == `SLLV);
     wire isSRAV = (op == `SPECIAL) & (funct == `SRAV);
     wire isSRLV = (op == `SPECIAL) & (funct == `SRLV);
-    wire isLUI = (op == `LUI);
+    assign isLUI = (op == `LUI);
     
     wire isVarShift = |{isSLLV, isSRAV, isSRLV};
     wire isShift = |{isSLL, isSRA, isSRL, isLUI, isVarShift};
