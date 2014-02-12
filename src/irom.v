@@ -43,8 +43,8 @@ module irom (
     assign memory[ 20] = {`BEQ, `T5, 16'd0, 16'd100};
     assign memory[ 21] = {`SPECIAL, `T5, `S0, `T1, 5'd0, `SLTU};
     assign memory[ 22] = {`BEQ, `T1, 16'd1, 16'd100};
-    assign memory[ 23] = {`SLTI, `ZERO, `S3, 16'b1};
-    assign memory[ 24] = {`BEQ, `S3, 16'd1, 16'd100};
+    assign memory[ 23] = {`SLTI, `ZERO, `S3, 16'b1};   // $S3 = 1
+    assign memory[ 24] = {`BNE, `S3, 16'd1, 16'd100};  //Should skip this instruction since branching fails
     assign memory[ 25] = {`SLTIU, `ZERO, `S3, 16'b1};
     assign memory[ 26] = {`BEQ, `S3, 16'd1, 16'd100};
     assign memory[ 27] = {`SPECIAL, `S3, `S3, `S3, 5'd0, `AND};
@@ -52,9 +52,9 @@ module irom (
     assign memory[ 29] = {`ANDI, `ZERO, `S3, 16'hffff};
     assign memory[ 30] = {`BEQ, `S3, 16'd0, 16'd100};
     assign memory[ 31] = {`SPECIAL, `T0, `T0, `T0, 5'd0, `XOR};
-    assign memory[ 32] = {`J, 26'd300};
-    assign memory[ 33] = {`JAL, 26'd400};
-    assign memory[ 34] = {`NOP};
+    assign memory[ 32] = {`BLEZ, `ZERO, 16'd0, 16'd33}; // Testing the Branch Instructions
+    assign memory[ 33] = {`BGTZ, `S0, 16'd0, 16'd34};
+    assign memory[ 34] = {`BGEZ, `ZERO, 5'h1, 16'd35};
     assign memory[ 35] = {`NOP};
     assign memory[ 36] = {`NOP};
     assign memory[ 37] = {`NOP};

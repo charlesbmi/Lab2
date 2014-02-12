@@ -77,7 +77,7 @@ module decode (
     assign jump_reg_en = (op == `SPECIAL) & ((funct == `JR) | (funct == `JALR));
 
     wire jump_no_link = (op == `J) | ((op == `SPECIAL) & (funct == `JR));
-    wire jump_with_link = (op == `JAL) | ((op == `SPECIAL) & (funct == `JALR));
+    wire jump_with_link = (op == `JAL) | ((op == `SPECIAL) & (funct == `JALR)) | ((branch_en) & (rt_addr == BLTZAL | rt_addr == BGEZAL));
 
 //******************************************************************************
 // shift instruction decode
