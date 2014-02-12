@@ -2,8 +2,7 @@
 
 `include "mips_defines.v"
 
-`define WRITE_BYTE 26'd505
-`define WRITE_SQUARE 26'd488
+`define WRITE_BYTE 26'd496
 `define POLL_FOR_READY 26'd506
 `define EXIT 26'd511
 `define ADDR_WIDTH 9
@@ -20,7 +19,7 @@ module irom (
     
     assign dout = memory[addr];
     
-    assign memory[  0] = {`ORI, `ZERO, `T0, 16'hffff};
+    assign memory[  0] = {`ORI, `ZERO, `T0, 16'h00ff};
     assign memory[  1] = {`SPECIAL, `NULL, `T0, `T0, 5'd16, `SLL};
     assign memory[  2] = {`ORI, `ZERO, `T1, 16'h2};
     assign memory[  3] = {`SPECIAL, `NULL, `T1, `T1, 5'd16, `SLL};
@@ -496,40 +495,40 @@ module irom (
     assign memory[473] = {`NOP};
     assign memory[474] = {`NOP};
     assign memory[475] = {`NOP};
-    assign memory[476] = {`LUI, `NULL, `SP, 16'hffff};
-    assign memory[477] = {`NOP};
-    assign memory[478] = {`ADDI, `ZERO, `A0, 16'd4};
-    assign memory[479] = {`ADDI, `ZERO, `A1, 16'd4};
-    assign memory[480] = {`ADDI, `ZERO, `A2, 16'h2};
-    assign memory[481] = {`JAL, `WRITE_SQUARE};
-    assign memory[482] = {`NOP};
-    assign memory[483] = {`NOP};
-    assign memory[484] = {`NOP};
+    assign memory[476] = {`LUI, `NULL, `SP, 16'hffff}; // Initialize stack pointer to top of memory
+    assign memory[477] = {`ORI, `SP, `SP, 16'hfffc};
+    assign memory[478] = {`LUI, `NULL, `T7, 16'h1}; // Initialize {8’b0, color, x, y} to x=y=0
+    assign memory[479] = {`NOP};
+    assign memory[480] = {`SPECIAL, `ZERO, `ZERO, `T0,`NULL, `ADD}; // counter i
+    assign memory[481] = {`JAL, `WRITE_BYTE};
+    assign memory[482] = {`ADDI, `T0, `T0, 16'b1};
+    assign memory[483] = {`SLTI, `T0, `T1, 16'd1000};
+    assign memory[484] = {`BNE, `T1, `ZERO, 16'd0 - 16'd4};
     assign memory[485] = {`NOP};
-    assign memory[486] = {`J, `EXIT}; // Functions
+    assign memory[486] = {`J, `EXIT}; // Function definitions below
     assign memory[487] = {`NOP};
-    assign memory[488] = {`ADDIU, `SP, `SP, 16'd0 - 16'd32}; // WRITE_SQUARE
-    assign memory[489] = {`SW, `SP, `RA, 16'd28}; // Exit write lw    $a0, 20($sp)
-    assign memory[490] = {`SW, `SP, `A0, 16'd24}; // Exit write lw    $a0, 20($sp)
-    assign memory[491] = {`SLTI, `A1, `T0, 16'd0};
-    assign memory[492] = {`BNE, `T0, `ZERO, 16'd7};
-    assign memory[493] = {`SLTI, `A1, `T0, 16'd30};
-    assign memory[494] = {`BEQ, `T0, `ZERO, 16'd5}; // Branch to exit write
-    assign memory[495] = {`JAL, `WRITE_BYTE};
-    assign memory[496] = {`SPECIAL, `A1, `ZERO, `A0, `NULL, `ADD};
-    assign memory[497] = {`JAL, `WRITE_BYTE};
-    assign memory[498] = {`SPECIAL, `A2, `ZERO, `A0, `NULL, `ADD};
-    assign memory[499] = {`JAL, `WRITE_BYTE};
-    assign memory[500] = {`LW, `SP, `A0, 16'd24}; // Exit write lw    $a0, 20($sp)
-    assign memory[501] = {`LW, `SP, `RA, 16'd28}; // lw    $ra, 28($sp)
-    assign memory[502] = {`ADDIU, `SP, `SP, 16'd32}; // addiu $sp, $sp, 32
-    assign memory[503] = {`SPECIAL, `RA, `NULL, `NULL, `NULL, `JR}; // jr $ra
-    assign memory[504] = {`NOP}; // 
-    assign memory[505] = {`NOP}; // WRITE_BYTE: la    $t8, 0xffff0008 
-    assign memory[506] = {`LW, `T8, `T9, 16'b0}; // POLL_FOR_READY: lw    $t9, 0($t8)
-    assign memory[507] = {`ANDI, `T9, `T9, 16'd1}; // andi  $t9, $t9, 1
-    assign memory[508] = {`BLEZ, `T9, `NULL, `POLL_FOR_READY}; // blez  $t9, poll_for_ready
-    assign memory[509] = {`SW, `T8, `A0, 16'd4}; // sw $a0, 4($t8)
+    assign memory[488] = {`NOP};
+    assign memory[489] = {`NOP};
+    assign memory[490] = {`NOP};
+    assign memory[491] = {`NOP};
+    assign memory[492] = {`NOP};
+    assign memory[493] = {`NOP};
+    assign memory[494] = {`NOP};
+    assign memory[495] = {`NOP};
+    assign memory[496] = {`LUI, `NULL, `T8, 16'hffff}; // WRITE_BYTE: la    $t8, 0xffff000c
+    assign memory[497] = {`ORI, `T8, `T8, 16'h000c}; 
+    assign memory[498] = {`SW, `T8, `T7, 16'd0}; // sw $t7, 0($t8)
+    assign memory[499] = {`ADDI, `T7, `T7, 16'b1}; // Writing done: pick next location.
+    assign memory[500] = {`ANDI, `T7, `T6, 8'b0, 8'hff}; // zeros out x
+    assign memory[501] = {`SLTI, `T6, `T6, 8'd0, 8'd30};
+    assign memory[502] = {`BNE, `T6, `ZERO, 16'd7}; // then we're good to go and we exit
+    assign memory[503] = {`ADDI, `T7, `T7, 16'h0100 - 16'd30}; // zero out y and add one to x to reload
+    assign memory[504] = {`ANDI, `T7, `T6, 16'hffff}; // zeros out color
+    assign memory[505] = {`SLTI, `T6, `T6, 8'd40, 8'd0}; // is y not overflowed?
+    assign memory[506] = {`BNE, `T6, `ZERO, 16'd3}; // if not overflowed then we're good to go and we exit
+    assign memory[507] = {`SPECIAL, `NULL, `T7, `T7, 5'd16, `SRL}; // increment color and restart to 0
+    assign memory[508] = {`ADDI, `T7, `T7, 16'b1};
+    assign memory[509] = {`SPECIAL, `NULL, `T7, `T7, 5'd16, `SLL};
     assign memory[510] = {`SPECIAL, `RA, `NULL, `NULL, `NULL, `JR}; // jr $ra
     assign memory[511] = {`NOP}; // Exit
 
