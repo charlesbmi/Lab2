@@ -15,46 +15,46 @@ module irom (
 
     output wire [`INSTR_WIDTH-1:0] dout
 );
-    
+
     wire [`INSTR_WIDTH-1:0] memory [`NUM_INSTR-1:0];
     
     assign dout = memory[addr];
     
     assign memory[  0] = {`ORI, `ZERO, `T0, 16'hffff};
-    assign memory[  1] = {`BEQ, `T0, 16'hffff, 16'd100};
+    assign memory[  1] = {`BEQ, `T0, `T0, 16'd0};
     assign memory[  2] = {`SPECIAL, `NULL, `T0, `T0, 5'd16, `SLL};
-    assign memory[  3] = {`BEQ, `T0, 32'hffff0000, 16'd100};
+    assign memory[  3] = {`BEQ, `T0, `T0, 16'd0};
     assign memory[  4] = {`ORI, `ZERO, `T1, 16'h2};
-    assign memory[  5] = {`BEQ, `T1, 16'h2, 16'd100};
+    assign memory[  5] = {`BEQ, `T1, `T1, 16'd0};
     assign memory[  6] = {`SW, `T0, `T1, 16'hc};
     assign memory[  7] = {`SPECIAL, `ZERO, `T1, `S0, 5'd0, `ADD};
-    assign memory[  8] = {`BEQ, `S0, 16'd2, 16'd100};
+    assign memory[  8] = {`BEQ, `S0,`S0, 16'd0};
     assign memory[  9] = {`ANDI, `ZERO, `S1, 16'h100};
-    assign memory[ 10] = {`BEQ, `S1, 16'd0, 16'd100};
+    assign memory[ 10] = {`BEQ, `S1, `S1, 16'd0};
     assign memory[ 11] = {`SPECIAL, `S0, `S1, `T2, 5'd0, `ADDU};
-    assign memory[ 12] = {`BEQ, `T2, 16'd2, 16'd100};
+    assign memory[ 12] = {`BEQ, `T2, `T2, 16'd0};
     assign memory[ 13] = {`ADDIU, `ZERO, `S4, 16'd20};
-    assign memory[ 14] = {`BEQ, `S4, 16'd20, 16'd100};
+    assign memory[ 14] = {`BEQ, `S4, `S4, 16'd0};
     assign memory[ 15] = {`SPECIAL, `ZERO, `S0, `T1, 5'd0, `SUB};
-    assign memory[ 16] = {`BEQ, `S0, 16'd2, 16'd100};
+    assign memory[ 16] = {`BEQ, `S0, `S0, 16'd0};
     assign memory[ 17] = {`SPECIAL, `T2, `T2, `S0, 5'd0, `SUBU};
-    assign memory[ 18] = {`BEQ, `T2, 16'd2, 16'd100};
+    assign memory[ 18] = {`BEQ, `T2, `T2, 16'd0};
     assign memory[ 19] = {`SPECIAL, `S0, `ZERO, `T5, 5'd0, `SLT};
-    assign memory[ 20] = {`BEQ, `T5, 16'd0, 16'd100};
+    assign memory[ 20] = {`BEQ, `T5, `T5, 16'd0};
     assign memory[ 21] = {`SPECIAL, `T5, `S0, `T1, 5'd0, `SLTU};
-    assign memory[ 22] = {`BEQ, `T1, 16'd1, 16'd100};
+    assign memory[ 22] = {`BEQ, `T1, `T1, 16'd0};
     assign memory[ 23] = {`SLTI, `ZERO, `S3, 16'b1};   // $S3 = 1
-    assign memory[ 24] = {`BNE, `S3, 16'd1, 16'd100};  //Should skip this instruction since branching fails
+    assign memory[ 24] = {`BNE, `S3, `T1, 16'd0};  //Should skip this instruction since branching fails
     assign memory[ 25] = {`SLTIU, `ZERO, `S3, 16'b1};
-    assign memory[ 26] = {`BEQ, `S3, 16'd1, 16'd100};
+    assign memory[ 26] = {`BEQ, `S3, `S3, 16'd0};
     assign memory[ 27] = {`SPECIAL, `S3, `S3, `S3, 5'd0, `AND};
-    assign memory[ 28] = {`BEQ, `S0, 16'd2, 16'd100};
+    assign memory[ 28] = {`BEQ, `S0, `S0, 16'd0};
     assign memory[ 29] = {`ANDI, `ZERO, `S3, 16'hffff};
-    assign memory[ 30] = {`BEQ, `S3, 16'd0, 16'd100};
+    assign memory[ 30] = {`BEQ, `S3, `S3, 16'd0};
     assign memory[ 31] = {`SPECIAL, `T0, `T0, `T0, 5'd0, `XOR};
-    assign memory[ 32] = {`BLEZ, `ZERO, 16'd0, 16'd33}; // Testing the Branch Instructions
-    assign memory[ 33] = {`BGTZ, `S0, 16'd0, 16'd34};
-    assign memory[ 34] = {`BGEZ, `ZERO, 5'h1, 16'd35};
+    assign memory[ 32] = {`BLEZ, `ZERO, 5'd0, 16'd0}; // Testing the Branch Instructions
+    assign memory[ 33] = {`BGTZ, `S0, 5'd0, 16'd0};
+    assign memory[ 34] = {`BGEZ, `ZERO, 5'h1, 16'd0};
     assign memory[ 35] = {`NOP};
     assign memory[ 36] = {`NOP};
     assign memory[ 37] = {`NOP};
